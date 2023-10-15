@@ -2,60 +2,140 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Spring Boot Thymeleaf Application - Bootstrap Rich Text Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>JWT Tool - Decode and Encode</title>
 
-    <link th:rel="stylesheet" th:href="@{/assets/summernote/summernote-bs4.css}"/>
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .result {
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <h1 class="text-center mb-4">JWT Tool</h1>
 
     <div class="row">
-        <div class="col-md-8  col-first">
-            <form method="post" th:object="${post}">
-
-                <select th:field="*{algorithm}">
-                    <option th:value="'ES256'" th:text="ES256"></option>
-                    <option th:value="'ES384'" th:text="ES384"></option>
-                    <option th:value="'ES512'" th:text="ES512"></option>
-                    <option th:value="'RS256'" th:text="RS256"></option>
-                    <option th:value="'RS384'" th:text="RS384"></option>
-                    <option th:value="'RS512'" th:text="RS512"></option>
-                    <option th:value="'PS256'" th:text="PS256"></option>
-                    <option th:value="'PS384'" th:text="PS384"></option>
-                    <option th:value="'PS512'" th:text="PS512"></option>
-                </select>
-
-                <div class="form-group">
-                    <textarea type="text" rows="6" id="JWT" placeholder="JWT" class="form-control"
-                              th:field="*{jwt}" autocomplete="off"></textarea>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Decode JWT</h2>
                 </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/decode}" th:object="${post}">
+                        <div class="form-group">
+                            <label for="JWT">JWT</label>
+                            <textarea class="form-control" id="JWT" rows="6" th:field="*{jwt}" placeholder="Enter JWT here"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="JWK1">JWK</label>
+                            <textarea class="form-control" id="JWK1" rows="6" th:field="*{jwk}" placeholder="Enter JWK here"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-block" type="submit">
+                            <i class="fas fa-decode mr-2"></i>Decode JWT
+                        </button>
+                    </form>
+                    <div class="result mt-3" th:if="${not #maps.isEmpty(data)}">
+                        <h3>Decoded Result:</h3>
+                        <div th:each="entry : ${data}">
+                            <strong th:text="${entry.key}"></strong>: <span th:text="${entry.value}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <button class="btn btn-primary" type="submit">Decode JWT</button>
-            </form>
-            <div class="col-sm-12 mt-5 col-last">
-                <h1>JSON Data</h1>
-                <div th:each="entry : ${data}">
-                    <br>
-                    <p th:utext="${entry.key} + ': ' + ${entry.value}"></p>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Encode JWT</h2>
+                </div>
+                <div class="card-body">
+                    <form th:object="${encode}" th:action="@{/encode}" method="post">
+                        <div class="form-group">
+                            <label for="headerJWT">Header</label>
+                            <textarea class="form-control" id="headerJWT" rows="4" th:field="*{headerJson}" placeholder="Enter header JSON"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="bodyJWT">Body</label>
+                            <textarea class="form-control" id="bodyJWT" rows="4" th:field="*{bodyJson}" placeholder="Enter body JSON"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="jwk2">JWK (Optional)</label>
+                            <textarea class="form-control" id="jwk2" rows="4" th:field="*{jwk}" placeholder="Enter JWK (optional)"></textarea>
+                            <small class="form-text text-muted">If empty, a random one will be generated.</small>
+                        </div>
+                        <button class="btn btn-primary btn-block" type="submit">
+                            <i class="fas fa-encode mr-2"></i>Encode JWT
+                        </button>
+                        <div class="form-group mt-3">
+                            <label for="encodedJWT">Encoded JWT</label>
+                            <textarea class="form-control" id="encodedJWT" rows="4" th:field="*{encodedJWT}" readonly></textarea>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-
-
-<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
-<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-<script th:src="@{/assets/summernote/summernote-bs4.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.min.js"></script>
 
 <script>
-    $('#content').summernote({
-        height: 200
+    $(document).ready(function() {
+        // Auto-resize textareas
+        $('textarea').on('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Copy to clipboard functionality
+        $('.btn-copy').click(function() {
+            var targetId = $(this).data('target');
+            var $temp = $("<textarea>");
+            $("body").append($temp);
+            $temp.val($(targetId).val()).select();
+            document.execCommand("copy");
+            $temp.remove();
+
+            // Show tooltip
+            $(this).tooltip('show');
+            setTimeout(() => {
+                $(this).tooltip('hide');
+            }, 2000);
+        });
     });
 </script>
 
